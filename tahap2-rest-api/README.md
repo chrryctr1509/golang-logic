@@ -51,11 +51,11 @@ mysql -u root -p wallet_db < example_data/seed.sql
 
 Seed users (all PIN: `123456`):
 
-| Name | Phone | Balance |
-|------|-------|---------|
-| Alice Wijaya | 081234567891 | 500000 |
-| Bob Santoso | 081234567892 | 250000 |
-| Charlie Kusuma | 081234567893 | 100000 |
+| Name           | Phone        | Balance |
+| -------------- | ------------ | ------- |
+| Alice Wijaya   | 081234567891 | 500000  |
+| Bob Santoso    | 081234567892 | 250000  |
+| Charlie Kusuma | 081234567893 | 100000  |
 
 ### 5. Run Server
 
@@ -72,6 +72,7 @@ Server starts on `http://localhost:8080`.
 ### Public
 
 #### Register
+
 ```bash
 curl -X POST http://localhost:8080/register \
   -H "Content-Type: application/json" \
@@ -79,12 +80,13 @@ curl -X POST http://localhost:8080/register \
     "first_name": "John",
     "last_name": "Doe",
     "phone_number": "081299999999",
-    "address": "Jl.测试 123",
+    "address": "Jl. Merdeka No. 123",
     "pin": "123456"
   }'
 ```
 
 Response:
+
 ```json
 {
   "status": "SUCCESS",
@@ -93,7 +95,7 @@ Response:
     "first_name": "John",
     "last_name": "Doe",
     "phone_number": "081299999999",
-    "address": "Jl.测试 123",
+    "address": "Jl. Merdeka No. 123",
     "balance": 0,
     "created_date": "2026-05-11T00:00:00Z"
   }
@@ -101,6 +103,7 @@ Response:
 ```
 
 #### Login
+
 ```bash
 curl -X POST http://localhost:8080/login \
   -H "Content-Type: application/json" \
@@ -111,6 +114,7 @@ curl -X POST http://localhost:8080/login \
 ```
 
 Response:
+
 ```json
 {
   "status": "SUCCESS",
@@ -126,11 +130,13 @@ Response:
 ### Protected (Bearer Token Required)
 
 Get token from `/login`, then use in header:
-```
+
+```text
 Authorization: Bearer <access_token>
 ```
 
 #### Top Up
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/topup \
   -H "Content-Type: application/json" \
@@ -141,6 +147,7 @@ curl -X POST http://localhost:8080/api/v1/topup \
 ```
 
 Response:
+
 ```json
 {
   "status": "SUCCESS",
@@ -154,6 +161,7 @@ Response:
 ```
 
 #### Payment
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/pay \
   -H "Content-Type: application/json" \
@@ -165,6 +173,7 @@ curl -X POST http://localhost:8080/api/v1/pay \
 ```
 
 Response:
+
 ```json
 {
   "status": "SUCCESS",
@@ -179,6 +188,7 @@ Response:
 ```
 
 #### Transfer
+
 ```bash
 curl -X POST http://localhost:8080/api/v1/transfer \
   -H "Content-Type: application/json" \
@@ -191,6 +201,7 @@ curl -X POST http://localhost:8080/api/v1/transfer \
 ```
 
 Response (async — status is PENDING, then SUCCESS/FAILED processed by worker):
+
 ```json
 {
   "status": "SUCCESS",
@@ -206,12 +217,14 @@ Response (async — status is PENDING, then SUCCESS/FAILED processed by worker):
 ```
 
 #### Get Transactions
+
 ```bash
 curl -X GET http://localhost:8080/api/v1/transactions \
   -H "Authorization: Bearer <access_token>"
 ```
 
 Response (dynamic field name by transaction kind):
+
 ```json
 {
   "status": "SUCCESS",
@@ -248,6 +261,7 @@ Response (dynamic field name by transaction kind):
 ```
 
 #### Update Profile
+
 ```bash
 curl -X PUT http://localhost:8080/api/v1/profile \
   -H "Content-Type: application/json" \
@@ -260,6 +274,7 @@ curl -X PUT http://localhost:8080/api/v1/profile \
 ```
 
 Response:
+
 ```json
 {
   "status": "SUCCESS",
@@ -279,14 +294,14 @@ Response:
 
 ## Error Responses
 
-| HTTP | Condition | Response |
-|------|-----------|----------|
-| 400 | Amount <= 0 | `{"message": "Amount must be greater than 0"}` |
-| 400 | Balance insufficient | `{"message": "Balance is not enough"}` |
-| 400 | Phone already registered | `{"message": "Phone Number already registered"}` |
-| 400 | Wrong PIN | `{"message": "Phone Number and PIN doesn't match."}` |
-| 401 | Invalid/missing token | `{"message": "Unauthenticated"}` |
-| 404 | User not found | `{"message": "User not found"}` |
+| HTTP | Condition                | Response                                             |
+| ---- | ------------------------ | ---------------------------------------------------- |
+| 400  | Amount <= 0              | `{"message": "Amount must be greater than 0"}`       |
+| 400  | Balance insufficient     | `{"message": "Balance is not enough"}`               |
+| 400  | Phone already registered | `{"message": "Phone Number already registered"}`     |
+| 400  | Wrong PIN                | `{"message": "Phone Number and PIN doesn't match."}` |
+| 401  | Invalid/missing token    | `{"message": "Unauthenticated"}`                     |
+| 404  | User not found           | `{"message": "User not found"}`                      |
 
 ---
 
@@ -300,7 +315,7 @@ go test ./internal/service/...
 
 ## Architecture
 
-```
+```text
 main.go
   └── Gin Router
         ├── Public routes: /register, /login
@@ -312,7 +327,7 @@ main.go
               └── PUT /profile      → UserHandler.UpdateProfile
 
 Services:
-  ├── AuthService       → Register, Login, JWT generation
+  ├── AuthService        → Register, Login, JWT generation
   ├── TransactionService → TopUp, Payment, Transfer, GetTransactions
   └── UserService        → UpdateProfile
 
